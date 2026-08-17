@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>歯科技工データ連携｜技術論点の整理</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f4f6fa; color: #2d3748; line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(135deg, #1a56db 0%, #1e429f 100%);
+      color: white; padding: 36px 48px 28px;
+    }
+    header .label { font-size: 11px; letter-spacing: 2px; opacity: 0.7; text-transform: uppercase; margin-bottom: 6px; }
+    header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    header .meta { font-size: 12px; opacity: 0.75; }
+    .container { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+    .section { margin-bottom: 36px; }
+    .section-title {
+      font-size: 16px; font-weight: 700; color: #1a56db;
+      border-left: 4px solid #1a56db; padding-left: 12px; margin-bottom: 16px;
+    }
+    .card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+    .note {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
+      padding: 16px 20px; font-size: 13.5px; color: #78350f; margin-bottom: 24px;
+    }
+
+    /* フロー */
+    .flow-diagram {
+      background: white; border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07); padding: 32px 24px 28px;
+    }
+    .input-box {
+      background: #f8faff; border: 2px solid #93c5fd;
+      border-radius: 10px; padding: 10px 18px;
+      text-align: center; font-size: 13px; font-weight: 600; color: #1e40af;
+      min-width: 200px; display: inline-block; margin: 4px;
+    }
+    .icon { margin-right: 4px; }
+    .arrow-down { text-align: center; font-size: 20px; color: #94a3b8; margin: 8px 0; }
+    .flow-center { text-align: center; }
+
+    /* 確認事項 */
+    .qa-wrap { display: flex; flex-direction: column; gap: 12px; }
+    .qa { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+    .qa-header {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: #f8faff; padding: 14px 20px; border-bottom: 1px solid #e2e8f0;
+    }
+    .qa-num {
+      background: #1a56db; color: white; border-radius: 6px;
+      padding: 2px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;
+    }
+    .qa-num.hot { background: #be123c; }
+    .qa-q { font-weight: 600; font-size: 14px; color: #1e293b; }
+    .qa-body { padding: 14px 20px; font-size: 13.5px; color: #374151; line-height: 1.8; }
+    .qa-body ul { margin: 8px 0 8px 20px; }
+    .qa-body li { margin-bottom: 4px; }
+    .quote {
+      display: block; background: #f1f5f9; border-left: 3px solid #94a3b8;
+      padding: 8px 12px; margin: 10px 0; font-size: 12.5px; color: #475569;
+    }
+
+    /* テーブル */
+    table.flow-table { width: 100%; border-collapse: collapse; }
+    .flow-table th {
+      background: #1e293b; color: white; padding: 10px 16px;
+      font-size: 13px; text-align: left; font-weight: 600;
+    }
+    .flow-table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; }
+    .flow-table tr:last-child td { border-bottom: none; }
+    .flow-table tr.manual td { background: #fef9ee; }
+    .flow-table tr.manual-yellow td { background: #fffbeb; }
+    .step-no { text-align: center; font-weight: 700; font-size: 15px; color: #1a56db; width: 52px; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .b-auto   { background: #dbeafe; color: #1d4ed8; }
+    .b-manual { background: #ffe4e6; color: #be123c; }
+    .b-check  { background: #fef3c7; color: #92400e; }
+
+    /* 対応範囲 */
+    .scope-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .scope-col { flex: 1 1 320px; background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+    .scope-col h3 { font-size: 13px; padding: 12px 18px; color: white; }
+    .scope-col.inc h3 { background: #059669; }
+    .scope-col.exc h3 { background: #64748b; }
+    .scope-col ul { list-style: none; padding: 14px 18px; }
+    .scope-col li { font-size: 13px; padding: 5px 0 5px 18px; position: relative; }
+    .scope-col li::before { content: "・"; position: absolute; left: 4px; }
+    .guarantee {
+      margin-top: 14px; background: #ecfdf5; border: 1px solid #6ee7b7;
+      border-radius: 10px; padding: 14px 20px; font-size: 13.5px; color: #065f46; font-weight: 600;
+    }
+
+    footer { text-align: center; font-size: 12px; color: #94a3b8; padding: 28px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="label">Technical Notes</div>
+  <h1>歯科技工データ連携｜技術論点の整理</h1>
+  <div class="meta">作成日: 2026-08-17 &nbsp;|&nbsp; 作成: AIフローアーキテクト &nbsp;|&nbsp; お打ち合わせ用のたたき台</div>
+</header>
+
+<div class="container">
+
+  <div class="note">
+    本資料は、お打ち合わせのたたき台として、公開情報と当方の技術的な見立てのみをまとめたものです。
+    金額・体制・スケジュールのご提案は含んでおりません。御社よりお預かりした資料の内容は記載しておりません。
+  </div>
+
+  <!-- 1. 全体の流れ -->
+  <div class="section">
+    <div class="section-title">1. 受注から設計データ連携までの流れ（一般的な形）</div>
+    <div class="flow-diagram flow-center">
+      <div class="input-box" style="border-color:#93c5fd;color:#1e40af;"><span class="icon">①</span>紙・PDF の技工指示書<br><small style="font-weight:400;font-size:11px;">歯科医院から届く</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">②</span>読み取り（AI-OCR）<br><small style="font-weight:400;font-size:11px;">患者・歯式・材料などを抽出</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#fcd34d;color:#92400e;"><span class="icon">③</span>読み取り結果の突き合わせ<br><small style="font-weight:400;font-size:11px;">誤りをここで止める</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">④</span>ラボ管理ソフトへ取り込み<br><small style="font-weight:400;font-size:11px;">最初の関門（下記 確認①）</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">⑤</span>スキャンデータの取得<br><small style="font-weight:400;font-size:11px;">各社クラウドから（下記 確認③）</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">⑥</span>設計ソフトへ受け渡し<br><small style="font-weight:400;font-size:11px;">相手側が受け付ける形に合わせる</small></div>
+      <div class="arrow-down">↓</div>
+      <div class="input-box" style="border-color:#c4b5fd;color:#4c1d95;"><span class="icon">⑦</span>材料計測データの記録<br><small style="font-weight:400;font-size:11px;">使用履歴として残す</small></div>
+    </div>
+  </div>
+
+  <!-- 2. 確認事項 -->
+  <div class="section">
+    <div class="section-title">2. お打ち合わせで確認させていただきたい事項（全5項目）</div>
+    <div class="qa-wrap">
+
+      <div class="qa">
+        <div class="qa-header">
+          <span class="qa-num">確認 ①</span>
+          <span class="qa-q">ラボ管理ソフトに「取り込み口」があるか</span>
+        </div>
+        <div class="qa-body">
+          読み取りの精度より先に、<strong>読み取った結果を受け取る側に入口があるか</strong>で実現方式が変わります。
+          国内で広く使われているラボ用受注販売管理ソフトの公開情報を確認したところ、動作環境は Windows 10/11 とされ、出力については次の記載がありました。
+          <span class="quote">「すべての資料はＣＳＶ出力しエクセルでカスタマイズ」</span>
+          一方で、<strong>取り込み（インポート）と API についての記載は公開情報に見当たりませんでした</strong>。
+          そこで、次の2点を先に確定させたいと考えております。
+          <ul>
+            <li>画面に受注データを取り込むメニューがあるか</li>
+            <li>開発元へ取込機能の有無・オプションを確認できる状態か（バージョンと保守契約）</li>
+          </ul>
+          → この進め方でよろしいでしょうか？
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-header">
+          <span class="qa-num">確認 ②</span>
+          <span class="qa-q">入口が無かった場合、どこまで許容されるか</span>
+        </div>
+        <div class="qa-body">
+          取り込み口が無い場合、代替は次の3つになります。
+          <ul>
+            <li>ア）開発元へ取込機能をオプションとして依頼する</li>
+            <li>イ）画面の操作そのものを自動化して入力する</li>
+            <li>ウ）中間ファイルを用意し、担当者が1操作で取り込む運用にする</li>
+          </ul>
+          イ）は動作しますが、ソフトの画面が更新されると止まりやすく、保守の前提が変わります。
+          先にご意向を伺えると、後戻りが起きません。
+          → ア〜ウのどれを想定されていますでしょうか？
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-header">
+          <span class="qa-num hot">確認 ③</span>
+          <span class="qa-q">スキャナ各社クラウドの認証方式と、規約上の可否</span>
+        </div>
+        <div class="qa-body">
+          各社のクラウドから自動でデータを取得する場合、<strong>技術的にできるかとは別に、利用規約で自動ログイン・自動取得が認められているか</strong>を先に確認する必要があります。
+          また、多要素認証が有効になっている場合は自動化そのものが成立しません。
+          <ul>
+            <li>各社の利用規約に自動アクセスの制限があるか</li>
+            <li>多要素認証・IP制限の有無</li>
+            <li>公式に連携手段（API・パートナー向けの仕組み）が用意されていないか</li>
+          </ul>
+          規約上できないものを作ってしまうと、完成後に使えなくなります。ここは着手前に潰しておきたい点です。
+          → 各社の規約と認証方式を確認するお時間をいただけますでしょうか？
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-header">
+          <span class="qa-num">確認 ④</span>
+          <span class="qa-q">設計ソフトへの受け渡し方式</span>
+        </div>
+        <div class="qa-body">
+          取得したデータを設計ソフトへ渡す部分は、<strong>受け取る側が何を受け付けるか</strong>で作り方が決まります。
+          フォルダに置く形か、専用の取り込み機能か、パートナー向けの連携手段があるかで工数が変わります。
+          → 受け渡し先として想定されているソフトと、その連携手段を教えていただけますでしょうか？
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-header">
+          <span class="qa-num">確認 ⑤</span>
+          <span class="qa-q">材料計測データは、何をどこまで残すか</span>
+        </div>
+        <div class="qa-body">
+          計測器がPCに繋がるかどうかで、難易度が3段階に分かれます。
+          <ul>
+            <li>ア）機器から直接データを取得できる</li>
+            <li>イ）機器が出力するファイルを読む</li>
+            <li>ウ）担当者が数値を入力する</li>
+          </ul>
+          あわせて、残す目的（原価の把握・使用履歴の追跡・在庫の管理）によって、持つべき項目が変わります。
+          → 現在の測り方と、残したい目的を教えていただけますでしょうか？
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. 進め方 -->
+  <div class="section">
+    <div class="section-title">3. 進め方のご提案（段階を分ける）</div>
+    <div class="card">
+      <table class="flow-table">
+        <thead>
+          <tr>
+            <th style="width:52px;text-align:center;">手順</th>
+            <th>内容</th>
+            <th style="width:72px;text-align:center;">区分</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="manual-yellow"><td class="step-no">①</td><td>現地で実機を確認し、<strong>取り込み口の有無と認証方式を確定させる</strong></td><td style="text-align:center;"><span class="badge b-check">確認</span></td></tr>
+          <tr class="manual-yellow"><td class="step-no">②</td><td>確認結果をもとに、実現方式と必要な工数を確定する</td><td style="text-align:center;"><span class="badge b-check">確認</span></td></tr>
+          <tr><td class="step-no">③</td><td>最も効果の大きい1機能から試作する</td><td style="text-align:center;"><span class="badge b-auto">開発</span></td></tr>
+          <tr class="manual-yellow"><td class="step-no">④</td><td>試作をご確認いただき、方式を確定する</td><td style="text-align:center;"><span class="badge b-check">確認</span></td></tr>
+          <tr><td class="step-no">⑤</td><td>残りの機能を開発する</td><td style="text-align:center;"><span class="badge b-auto">開発</span></td></tr>
+          <tr class="manual"><td class="step-no">⑥</td><td>現地に配置し、実際の業務データでテストする</td><td style="text-align:center;"><span class="badge b-manual">現地</span></td></tr>
+          <tr><td class="step-no">⑦</td><td>運用開始・調整</td><td style="text-align:center;"><span class="badge b-auto">運用</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top:14px;margin-bottom:0;">
+      <strong>なぜ段階を分けるか</strong>：①で入口の有無が変わると、実現方式そのものが変わります。
+      確認の前に全体を確定させてしまうと、後から作り直しになり、かえって時間がかかります。
+      逆に①②が終われば、その後は見通しが立った状態で進められます。
+    </div>
+  </div>
+
+  <!-- 4. 対応範囲 -->
+  <div class="section">
+    <div class="section-title">4. 当方の対応範囲（現時点の想定）</div>
+    <div class="scope-grid">
+      <div class="scope-col inc">
+        <h3>想定に含まれるもの</h3>
+        <ul>
+          <li>現地での業務確認・ヒアリング</li>
+          <li>読み取りと連携部分の開発</li>
+          <li>動作テスト・精度の調整</li>
+          <li>現地への配置と立ち会い</li>
+          <li>操作手順書の作成</li>
+        </ul>
+      </div>
+      <div class="scope-col exc">
+        <h3>想定に含まれないもの</h3>
+        <ul>
+          <li>ラボ管理ソフト本体の改修（開発元の領域）</li>
+          <li>各クラウドサービスの利用料・アカウント取得</li>
+          <li>利用規約上できない自動化</li>
+          <li>計測機器・PC等のハードウェア購入</li>
+        </ul>
+      </div>
+    </div>
+    <div class="guarantee">
+      ・ご満足いただけなければ全額返金いたします
+    </div>
+    <div class="note" style="margin-top:14px;margin-bottom:0;">
+      上記は現時点の想定です。確認①〜⑤の結果によって範囲は変わりますので、確定は条件が揃ってからとさせてください。
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  技術論点の整理 &nbsp;|&nbsp; AIフローアーキテクト
+</footer>
+
+</body>
+</html>
