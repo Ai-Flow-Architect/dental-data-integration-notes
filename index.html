@@ -30,20 +30,24 @@
       padding: 16px 20px; font-size: 13.5px; color: #78350f; margin-bottom: 24px;
     }
 
-    /* フロー */
-    .flow-diagram {
-      background: white; border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07); padding: 32px 24px 28px;
+    /* フロー（スイムレーン SVG） */
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+    .legend .lg { display: inline-flex; align-items: center; font-size: 12px; color: #475569; }
+    .legend .lg i { width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; display: inline-block; }
+    .svg-wrap {
+      background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      padding: 16px; overflow-x: auto;
     }
-    .input-box {
-      background: #f8faff; border: 2px solid #93c5fd;
-      border-radius: 10px; padding: 10px 18px;
-      text-align: center; font-size: 13px; font-weight: 600; color: #1e40af;
-      min-width: 200px; display: inline-block; margin: 4px;
-    }
-    .icon { margin-right: 4px; }
-    .arrow-down { text-align: center; font-size: 20px; color: #94a3b8; margin: 8px 0; }
-    .flow-center { text-align: center; }
+    .svg-wrap svg { width: 100%; min-width: 720px; height: auto; display: block; }
+    .svg-wrap text { font-family: "Hiragino Sans", "Meiryo", sans-serif; }
+    .lane { font-size: 14px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+    .t1 { font-size: 13.5px; font-weight: 700; text-anchor: middle; }
+    .t2 { font-size: 11.5px; font-weight: 400; text-anchor: middle; }
+    .t3 { font-size: 11.5px; font-weight: 700; text-anchor: middle; }
+    /* CSS の text-anchor は SVG のプレゼンテーション属性に優先するため、
+       右寄せが要る箇所は属性でなく専用クラスで指定する */
+    .t3e { font-size: 11.5px; font-weight: 700; text-anchor: end; }
+    .bdg { font-size: 11px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
 
     /* 確認事項 */
     .qa-wrap { display: flex; flex-direction: column; gap: 12px; }
@@ -117,20 +121,114 @@
   <!-- 1. 全体の流れ -->
   <div class="section">
     <div class="section-title">1. 受注から設計データ連携までの流れ（一般的な形）</div>
-    <div class="flow-diagram flow-center">
-      <div class="input-box" style="border-color:#93c5fd;color:#1e40af;"><span class="icon">①</span>紙・PDF の技工指示書<br><small style="font-weight:400;font-size:11px;">歯科医院から届く</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">②</span>読み取り（AI-OCR）<br><small style="font-weight:400;font-size:11px;">患者・歯式・材料などを抽出</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#fcd34d;color:#92400e;"><span class="icon">③</span>読み取り結果の突き合わせ<br><small style="font-weight:400;font-size:11px;">誤りをここで止める</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">④</span>ラボ管理ソフトへ取り込み<br><small style="font-weight:400;font-size:11px;">最初の関門（下記 確認①）</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">⑤</span>スキャンデータの取得<br><small style="font-weight:400;font-size:11px;">各社クラウドから（下記 確認③）</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#6ee7b7;color:#065f46;"><span class="icon">⑥</span>設計ソフトへ受け渡し<br><small style="font-weight:400;font-size:11px;">相手側が受け付ける形に合わせる</small></div>
-      <div class="arrow-down">↓</div>
-      <div class="input-box" style="border-color:#c4b5fd;color:#4c1d95;"><span class="icon">⑦</span>材料計測データの記録<br><small style="font-weight:400;font-size:11px;">使用履歴として残す</small></div>
+    <div class="legend">
+      <span class="lg"><i style="background:#64748b"></i>歯科医院</span>
+      <span class="lg"><i style="background:#d97706"></i>ラボの担当者が行う</span>
+      <span class="lg"><i style="background:#1a56db"></i>システムが自動で行う</span>
+      <span class="lg"><i style="background:#be123c"></i>方式が分かれる分岐点</span>
+    </div>
+    <div class="svg-wrap">
+      <svg viewBox="0 0 820 950" role="img" aria-label="受注から設計データ連携までの業務フロー図" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/>
+          </marker>
+          <marker id="arR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#be123c"/>
+          </marker>
+        </defs>
+
+        <!-- レーン背景 -->
+        <rect x="8"   y="8" width="264" height="934" rx="8" fill="#f8fafc"/>
+        <rect x="280" y="8" width="264" height="934" rx="8" fill="#fffbeb"/>
+        <rect x="552" y="8" width="260" height="934" rx="8" fill="#f0f9ff"/>
+
+        <!-- レーンヘッダ -->
+        <rect x="8"   y="8" width="264" height="38" rx="8" fill="#64748b"/>
+        <rect x="280" y="8" width="264" height="38" rx="8" fill="#d97706"/>
+        <rect x="552" y="8" width="260" height="38" rx="8" fill="#1a56db"/>
+        <text x="140" y="33" class="lane">歯科医院</text>
+        <text x="412" y="33" class="lane">ラボの担当者</text>
+        <text x="682" y="33" class="lane">システム（自動）</text>
+
+        <!-- 矢印 -->
+        <path d="M140,128 L140,150 L682,150 L682,178" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M682,240 L682,262 L412,262 L412,290" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M412,352 L412,374 L682,374 L682,398" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M682,486 L682,522" fill="none" stroke="#be123c" stroke-width="2" marker-end="url(#arR)"/>
+        <path d="M602,442 L412,442 L412,522" fill="none" stroke="#be123c" stroke-width="2" marker-end="url(#arR)"/>
+        <path d="M682,590 L682,668" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M412,598 L412,636 L682,636" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 3"/>
+        <path d="M682,730 L682,762" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+        <path d="M682,824 L682,850 L412,850 L412,876" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+
+        <!-- ① 歯科医院 -->
+        <rect x="30" y="72" width="220" height="56" rx="8" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+        <text x="140" y="97"  class="t1" fill="#334155">① 技工指示書が届く</text>
+        <text x="140" y="116" class="t2" fill="#64748b">紙・PDF・画像</text>
+
+        <!-- ② 自動 -->
+        <rect x="572" y="180" width="220" height="60" rx="8" fill="#ffffff" stroke="#1a56db" stroke-width="2"/>
+        <text x="682" y="205" class="t1" fill="#1e3a8a">② 読み取り（AI-OCR）</text>
+        <text x="682" y="224" class="t2" fill="#1d4ed8">患者・歯式・材料を抽出</text>
+
+        <!-- ③ 担当者 -->
+        <rect x="302" y="292" width="220" height="60" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+        <text x="412" y="317" class="t1" fill="#92400e">③ 読み取り結果の確認</text>
+        <text x="412" y="336" class="t2" fill="#b45309">誤りをここで止める</text>
+
+        <!-- ◆ 分岐（確認①） -->
+        <polygon points="682,398 800,442 682,486 564,442" fill="#fff1f2" stroke="#be123c" stroke-width="2"/>
+        <text x="682" y="430" class="t1" fill="#9f1239">ラボ管理ソフトに</text>
+        <text x="682" y="449" class="t1" fill="#9f1239">取り込み口はあるか？</text>
+        <rect x="626" y="386" width="112" height="22" rx="11" fill="#be123c"/>
+        <text x="682" y="401" class="bdg">確認①（最初の関門）</text>
+
+        <text x="702" y="512" class="t3" fill="#be123c">ある</text>
+        <text x="432" y="512" class="t3" fill="#be123c">ない</text>
+
+        <!-- ④ 自動 -->
+        <rect x="572" y="524" width="220" height="66" rx="8" fill="#ffffff" stroke="#1a56db" stroke-width="2"/>
+        <text x="682" y="549" class="t1" fill="#1e3a8a">④ そのまま自動で投入</text>
+        <text x="682" y="568" class="t2" fill="#1d4ed8">CSV を取り込ませる</text>
+        <text x="682" y="584" class="t2" fill="#1d4ed8">最短で終わる</text>
+
+        <!-- ④' 担当者（確認②） -->
+        <rect x="302" y="524" width="220" height="74" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+        <text x="412" y="547" class="t1" fill="#92400e">④' 代替の3案から選ぶ</text>
+        <text x="412" y="565" class="t2" fill="#b45309">ア）開発元へオプション依頼</text>
+        <text x="412" y="580" class="t2" fill="#b45309">イ）画面操作を自動化</text>
+        <text x="412" y="595" class="t2" fill="#b45309">ウ）1操作で取り込む運用</text>
+        <rect x="454" y="514" width="68" height="20" rx="10" fill="#d97706"/>
+        <text x="488" y="528" class="bdg">確認②</text>
+
+        <!-- ⑤ 自動（確認③） -->
+        <rect x="572" y="670" width="220" height="60" rx="8" fill="#ffffff" stroke="#1a56db" stroke-width="2"/>
+        <text x="682" y="697" class="t1" fill="#1e3a8a">⑤ スキャンデータ取得</text>
+        <text x="682" y="716" class="t2" fill="#1d4ed8">各社クラウドから</text>
+        <rect x="724" y="660" width="68" height="20" rx="10" fill="#1a56db"/>
+        <text x="758" y="674" class="bdg">確認③</text>
+
+        <!-- ⑥ 自動（確認④） -->
+        <rect x="572" y="764" width="220" height="60" rx="8" fill="#ffffff" stroke="#1a56db" stroke-width="2"/>
+        <text x="682" y="791" class="t1" fill="#1e3a8a">⑥ 設計ソフトへ受け渡し</text>
+        <text x="682" y="810" class="t2" fill="#1d4ed8">相手が受け付ける形に合わせる</text>
+        <rect x="724" y="754" width="68" height="20" rx="10" fill="#1a56db"/>
+        <text x="758" y="768" class="bdg">確認④</text>
+
+        <!-- ⑦ 担当者（確認⑤） -->
+        <rect x="302" y="878" width="220" height="56" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+        <text x="412" y="903" class="t1" fill="#92400e">⑦ 材料計測データの記録</text>
+        <text x="412" y="922" class="t2" fill="#b45309">使用履歴として残す</text>
+        <rect x="454" y="868" width="68" height="20" rx="10" fill="#d97706"/>
+        <text x="488" y="882" class="bdg">確認⑤</text>
+      </svg>
+    </div>
+    <div class="note" style="margin-top:14px;margin-bottom:0;">
+      <strong>この図で一番申し上げたいのは、赤いひし形の分岐です。</strong>
+      読み取りの精度をどれだけ上げても、受け取る側に入口が無ければ ④ には進めません。
+      入口の有無で、その先が「最短で終わる道」と「代替を選ぶ道」に分かれます。
+      ここを最初に確定させたい、というのが本資料の主旨です。
     </div>
   </div>
 
